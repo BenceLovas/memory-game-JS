@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="{{ url_for('static', filename='scripts/game.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/game.css') }}">
+    <title>Document</title>
+</head>
+<body>
+    <div id="wrapper" data-column-number="{{ request.form['column_number'] }}" data-row-number="{{ request.form['row_number'] }}">
+    </div>
+</body>
+</html>

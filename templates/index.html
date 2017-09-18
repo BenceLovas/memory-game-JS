@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Index</title>
+</head>
+<body>
+    <form action="{{ url_for('game') }}" method="POST">
+
+        <label for="column_number">Number of Columns</label>
+        <select name="column_number" required>
+            <option value="" selected hidden disabled>Please select a number</option>
+        {% for number in column_number_list %}
+            <option value="{{ number }}">{{ number }}</option>
+        {% endfor %}
+        </select>
+
+        <label for="row_number">Number of Rows</label>
+        <select name="row_number" required>
+            <option value="" selected hidden disabled>Please select a number</option>
+        {% for number in row_number_list %}
+            <option value="{{ number }}">{{ number }}</option>
+        {% endfor %}
+        </select>
+
+        <input type="submit" value="Play">
+
+    </form>
+</body>
+</html>

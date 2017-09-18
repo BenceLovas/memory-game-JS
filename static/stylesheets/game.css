@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.row {
+    height: 100px;
+    margin: 6px 0px;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    margin: 0px 3px;
+    display: inline-block;
+    background-color: black;
+}
+
+.hidden {
+    visibility: hidden;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin: 0px 3px;
+}

@@ -1,0 +1,2 @@
+COLUMN_NUMBER_LIST = range(1, 5)
+ROW_NUMBER_LIST = range(2, 5, 2)
