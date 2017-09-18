@@ -53,7 +53,12 @@ gameDiv.appendChild(board);
 function handleClick () {
     console.log("turn counter", turnCounter);
     if (turnCounter === 1) {
-        this.style.backgroundColor = this.dataset['color'];
+        this.style.transform = "perspective(600px) rotateY(-180deg)";
+        var self = this;
+        setTimeout(function() {
+            self.style.backgroundColor = self.dataset['color'];
+            self.style.transform = "perspective(600px) rotateY(0deg)";
+        }, 200);
         this.dataset['flipped'] = 'true';
         firstCard = this.dataset['color'];
         this.removeEventListener('click', handleClick);
@@ -63,18 +68,27 @@ function handleClick () {
         for (var i = 0; i < cards.length; i++) {
             cards[i].removeEventListener('click', handleClick);
         }
-        this.style.backgroundColor = this.dataset['color'];
+        this.style.transform = "perspective(600px) rotateY(-180deg)";
+        var self = this;
+        setTimeout(function() {
+            self.style.backgroundColor = self.dataset['color'];
+            self.style.transform = "perspective(600px) rotateY(0deg)";
+        }, 200);
         this.dataset['flipped'] = 'true';
         secondCard = this.dataset['color'];
         if (firstCard === secondCard) {
             flippedCards = flippedCards + 2;
-            if (flippedCards === totalCards) {
-                alert('You won!');
-            }
+
             var bothCards = document.querySelectorAll('[data-flipped=true]');
-            for (i = 0; i < bothCards.length; i++) {
-                bothCards[i].setAttribute('class', 'hidden');
-            }
+            setTimeout(function() {
+                for (i = 0; i < bothCards.length; i++) {
+                    bothCards[i].setAttribute('class', 'hidden');
+                }
+                if (flippedCards === totalCards) {
+                    alert('You won!');
+                }
+            }, 1000);
+
             for (var i = 0; i < cards.length; i++) {
                 cards[i].addEventListener('click', handleClick);
             }
