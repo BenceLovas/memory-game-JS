@@ -4,19 +4,18 @@
 }
 
 .row {
-    height: 100px;
-    margin: 6px 0px;
+    margin: 15px 5px;
 }
 
-.card {
-    width: 100px;
-    height: 100px;
-    margin: 0px 3px;
-    display: inline-block;
+.card,
+.col,
+.removed {
     background-color: black;
     transform: perspective(600px) rotateY(0deg);
     backface-visibility: hidden;
     transition: transform .3s linear 0s;
+    height: 100px;
+    width: 100px;
 }
 
 .hidden {

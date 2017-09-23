@@ -16,7 +16,6 @@ def index():
 
 @app.route('/game', methods=['POST'])
 def game():
-    print(request.form)
     return render_template('game.html')
     
 
