@@ -13,11 +13,5 @@ def index():
                            column_number_list=column_number_list,
                            row_number_list=row_number_list)
 
-
-@app.route('/game', methods=['POST'])
-def game():
-    return render_template('game.html')
-    
-
 if __name__ == "__main__":
     app.run(debug=True)

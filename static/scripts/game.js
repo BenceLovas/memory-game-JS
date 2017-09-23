@@ -30,18 +30,20 @@ const game = {
     cards: document.getElementsByClassName(config.commonClass),
     firstCardColor: null,
     secondCardColor: null,
+    columnNumber: null,
+    rowNumber: null,
 };
 
-game.gameDiv = document.getElementById("wrapper");
+// game.gameDiv = document.getElementById("wrapper");
 
-game.columnNumber = parseInt(game.gameDiv.dataset.columnNumber);
-game.rowNumber = parseInt(game.gameDiv.dataset.rowNumber);
-game.totalCardsNumber = game.columnNumber * game.rowNumber;
-game.colorsNeeded = game.totalCardsNumber / 2;
+// game.columnNumber = parseInt(game.gameDiv.dataset.columnNumber);
+// game.rowNumber = parseInt(game.gameDiv.dataset.rowNumber);
+game.getTotalCardsNumber = function() { return game.columnNumber * game.rowNumber; };
+game.getColorsNeeded = function() { return game.getTotalCardsNumber() / 2; };
 
-game.arraySlice = config.colorsArray.slice(0, game.colorsNeeded);
+game.getArraySlice = function() { return config.colorsArray.slice(0, game.getColorsNeeded()); };
 game.getRandomizedArray = function() {
-    const array = game.arraySlice;
+    const array = game.getArraySlice();
     array.double();
     array.shuffle();
     
@@ -79,7 +81,7 @@ game.flipCardsBack = function () {
 };
 
 game.isCardMatch = function() { return game.firstCardColor === game.secondCardColor; };
-game.isGameOver = function() { return game.totalCardsNumber === game.flippedCards; };
+game.isGameOver = function() { return game.getTotalCardsNumber() === game.flippedCards; };
 
 game.addEventListenerToArray = function(array, callbackFunction) {
     for (let i = 0; i < array.length; i++) {
@@ -161,7 +163,46 @@ game.createBoard = function() {
 
 game.initializeGame = function() {
     const board = game.createBoard();
-    game.gameDiv.appendChild(board);
+    const gameDiv = document.createElement(config.htmlTag);
+    gameDiv.setAttribute('id', 'gameDiv');
+    gameDiv.appendChild(board);
+    document.body.appendChild(gameDiv);
 }
 
-game.initializeGame();
+game.resetData = function() {
+    game.flippedCards = 0;
+    game.firstClick = true;
+    game.cards = document.getElementsByClassName(config.commonClass);
+    game.firstCardColor = null;
+    game.secondCardColor = null;
+    game.columnNumber = null;
+    game.rowNumber = null;
+}
+
+game.clearBoard = function() {
+    const board = document.getElementById("gameDiv");
+    if (board !== null) {
+        board.parentNode.removeChild(board);
+    }
+}
+
+game.processForm = function() {
+    game.resetData();
+    game.clearBoard();
+    const columnNumber = document.getElementById("columnNumber");
+    game.columnNumber = parseInt(columnNumber.options[columnNumber.selectedIndex].value);
+    const rowNumber = document.getElementById("rowNumber");
+    game.rowNumber = parseInt(rowNumber.options[rowNumber.selectedIndex].value);
+    if (isNaN(game.rowNumber) || isNaN(game.columnNumber)) {
+        alert("Please select from options.");
+    } else {
+        game.initializeGame();
+    }
+}
+
+game.play = function() {
+    const playButton = document.getElementById("play");
+    playButton.addEventListener("click", game.processForm);
+}
+
+game.play();
