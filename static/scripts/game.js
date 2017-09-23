@@ -13,7 +13,6 @@ Array.prototype.double = function() {
 }
 
 const config = {
-
     coverColor: "black",
     flippedSelector: "[data-flipped=true]",
     htmlTag: "div",
@@ -22,49 +21,45 @@ const config = {
     eventToListen: "click",
     victoryString: "Congratulations!",
     commonClass: "card",
-
+    colorsArray: ["#679327","#3A1B0F","#A4DA65","#5A3810","#990515","#250D3B","#E0082D","#50105A"],
 };
 
 const game = {
-    
-    gameDiv: document.getElementById("wrapper"),
-    colorsArray: ["#679327","#3A1B0F","#A4DA65","#5A3810","#990515","#250D3B","#E0082D","#50105A"],
-
-    getColumnNumber: function() { return parseInt(this.gameDiv.dataset.columnNumber); },
-    getRowNumber: function() { return parseInt(this.gameDiv.dataset.rowNumber); },
-    getTotalCardsNumber: function() { return this.getColumnNumber() * this.getRowNumber(); },
-
     flippedCards: 0,
     firstClick: true,
-    cards: document.getElementsByClassName('card'),
+    cards: document.getElementsByClassName(config.commonClass),
     firstCardColor: null,
     secondCardColor: null,
-
 };
 
-function createRandomizedSliceOfArray(array, sliceSize) {
+game.gameDiv = document.getElementById("wrapper");
 
-    const arraySlice = array.slice(0, sliceSize);
-    arraySlice.double();
-    arraySlice.shuffle();
+game.columnNumber = parseInt(game.gameDiv.dataset.columnNumber);
+game.rowNumber = parseInt(game.gameDiv.dataset.rowNumber);
+game.totalCardsNumber = game.columnNumber * game.rowNumber;
+game.colorsNeeded = game.totalCardsNumber / 2;
 
-    return arraySlice;
-}
+game.arraySlice = config.colorsArray.slice(0, game.colorsNeeded);
+game.getRandomizedArray = function() {
+    const array = game.arraySlice;
+    array.double();
+    array.shuffle();
+    
+    return array;
+};
 
-function flipCard(clickedCard) {
-
+game.flipCard = function(clickedCard) {
     clickedCard.style.transform = "perspective(200px) rotateY(-180deg)";
     setTimeout(function() {
         clickedCard.style.transform = "perspective(200px) rotateY(0deg)";
         clickedCard.style.backgroundColor = clickedCard.dataset.color;
     }, 200);
     clickedCard.dataset.flipped = true;
-}
+};
 
-function handleClick(clickedCard) {
+game.clickProcess = function(clickedCard) {
+    game.flipCard(clickedCard);
     
-    flipCard(clickedCard);
-
     if (game.firstClick) {
         game.firstCardColor = clickedCard.dataset.color;
         game.firstClick = false;
@@ -72,128 +67,101 @@ function handleClick(clickedCard) {
         game.secondCardColor = clickedCard.dataset.color;
         game.firstClick = true;
     }
-}
+};
 
-function flipCardsBack() {
-
-    const cards = document.querySelectorAll(config.flippedSelector);
+game.selectFlippedCards = function() { return document.querySelectorAll(config.flippedSelector); };
+game.flipCardsBack = function () {
+    const cards = game.selectFlippedCards();
     for (let i = 0; i < cards.length; i++) {
         cards[i].style.backgroundColor = config.coverColor;
         cards[i].dataset.flipped = false;
-    };
-}
-
-function isCardMatch() {
-
-    return game.firstCardColor === game.secondCardColor;
-}
-
-function isGameOver() {
-
-    return game.getTotalCardsNumber() === game.flippedCards;
-}
-
-function eventToggler(array, on=true) {
-
-    for (let i = 0; i < array.length; i++) {
-
-        if (on) {
-            array[i].addEventListener(config.eventToListen, turnProcess);
-
-        } else {
-            array[i].removeEventListener(config.eventToListen, turnProcess);
-        }
     }
-}
+};
 
-function flipCardsBackAndResetEventListeners() {
+game.isCardMatch = function() { return game.firstCardColor === game.secondCardColor; };
+game.isGameOver = function() { return game.totalCardsNumber === game.flippedCards; };
 
-    flipCardsBack();
-    eventToggler(game.cards, true);
-}
-
-function removeCards(array) {
-    
+game.addEventListenerToArray = function(array, callbackFunction) {
     for (let i = 0; i < array.length; i++) {
-        array[i].classList.remove("card");
+        array[i].addEventListener(config.eventToListen, callbackFunction);
+    }
+};
+
+game.removeEventListenerFromArray = function(array, callbackFunction) {
+    for (let i = 0; i < array.length; i++) {
+        array[i].removeEventListener(config.eventToListen, callbackFunction);
+    }
+};
+
+game.removeCards = function(array) {
+    for (let i = 0; i < array.length; i++) {
+        array[i].classList.remove(config.commonClass);
         array[i].dataset.flipped = config.removed;
     }
-}
+};
 
-function processMatch() {
-
+game.processMatch = function(callbackFunction) {
     game.flippedCards += 2;
-    
-    const cards = document.querySelectorAll(config.flippedSelector);
-    removeCards(cards);
-    eventToggler(game.cards, true);
+    const cards = game.selectFlippedCards();
+    game.removeCards(cards);
+    game.addEventListenerToArray(game.cards, callbackFunction);
 }
 
-function turnProcess() {
-    
+game.turnProcess = function() {
     if (game.firstClick) {
-        handleClick(this);
-        this.removeEventListener(config.eventToListen, turnProcess);
-
+        game.clickProcess(this);
+        this.removeEventListener(config.eventToListen, game.turnProcess);
     } else {
-        handleClick(this);
-        eventToggler(game.cards, false);
-
-        if (isCardMatch()) {
-            processMatch();
-            
-            if (isGameOver()) {
+        game.clickProcess(this);
+        game.removeEventListenerFromArray(game.cards, game.turnProcess);
+        if (game.isCardMatch()) {
+            game.processMatch(game.turnProcess);
+            if (game.isGameOver()) {
                 alert(config.victoryString);
-            } 
-
+            }
         } else {
-            setTimeout(function () {
-                flipCardsBack();
-                eventToggler(game.cards, true);
+            setTimeout(function() {
+                game.flipCardsBack();
+                game.addEventListenerToArray(game.cards, game.turnProcess);
             }, 1000);
         }
     }
 };
 
-function createCard(color) {
-
+game.createCard = function(color) {
     const card = document.createElement(config.htmlTag);
     card.dataset.color = color;
     card.dataset.flipped = false;
     card.classList.add(config.commonClass, "col", "col-xs-4", "col-sm-2", "col-md-2", "mr-auto");
-    card.addEventListener(config.eventToListen, turnProcess);
+    card.addEventListener(config.eventToListen, game.turnProcess);
 
     return card;
-}
+};
 
-function createBoard() {
-
+game.createBoard = function() {
     const boardDiv = document.createElement(config.htmlTag);
-    boardDiv.setAttribute('class', 'container-fluid');
+    boardDiv.setAttribute(config.attributeToSet, 'container-fluid');
     let rowDiv = document.createElement(config.htmlTag);
-    rowDiv.setAttribute('class', 'row justify-content-between');
+    rowDiv.setAttribute(config.attributeToSet, 'row justify-content-between');
 
-    const colorsNeeded = game.getTotalCardsNumber() / 2;
-    const colorsArray = createRandomizedSliceOfArray(game.colorsArray, colorsNeeded);
-    const columnNumber = game.getColumnNumber();
+    const colorsArray = game.getRandomizedArray();
     for (let i = 0; i < colorsArray.length; i++) {
 
-        const card = createCard(colorsArray[i]);
+        const card = game.createCard(colorsArray[i]);
         rowDiv.appendChild(card);
 
-        if (rowDiv.childElementCount === columnNumber) {
+        if (rowDiv.childElementCount === game.columnNumber) {
             boardDiv.appendChild(rowDiv);
             rowDiv = document.createElement(config.htmlTag);
-            rowDiv.setAttribute('class', 'row justify-content-between');
+            rowDiv.setAttribute(config.attributeToSet, 'row justify-content-between');
         }    
     }
-
     return boardDiv;
-}
+};
 
-function memoryGame() {
-    const board = createBoard();
+game.initializeGame = function() {
+    const board = game.createBoard();
     game.gameDiv.appendChild(board);
 }
 
-memoryGame();
+game.initializeGame();
