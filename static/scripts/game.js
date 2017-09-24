@@ -13,6 +13,14 @@ Array.prototype.double = function() {
 };
 
 const config = {
+    boardAttribute: "container",
+    rowAttribute: "row",
+    gameDivAttributeToSet: "id",
+    gameDivAttribute: "gameDiv",
+    transparent: "0",
+    columnNumberId: "columnNumber",
+    rowNumberId: "rowNumber",
+    playButtonId: "play",
     flipBackOfCard: "perspective(600px) rotateY(-180deg)",
     flipBackOfCardBack: "perspective(600px) rotateY(0deg)",
     flipFrontOfCard: "perspective(600px) rotateY(0deg)",
@@ -54,9 +62,12 @@ game.getRandomizedArray = function() {
 };
 
 game.flipCard = function(clickedCard) {
+
     for (let i = 0; i < clickedCard.childNodes.length; i++) {
+
         if (clickedCard.childNodes[i].className === config.backOfCard) {
             clickedCard.childNodes[i].style.transform = config.flipBackOfCard;
+
         } else if (clickedCard.childNodes[i].className === config.frontOfCard) {
             clickedCard.childNodes[i].style.transform = config.flipFrontOfCard;
         }
@@ -70,6 +81,7 @@ game.clickProcess = function(clickedCard) {
     if (game.firstClick) {
         game.firstCardColor = clickedCard.dataset.color;
         game.firstClick = false;
+
     } else {
         game.secondCardColor = clickedCard.dataset.color;
         game.firstClick = true;
@@ -80,9 +92,12 @@ game.selectFlippedCards = function() { return document.querySelectorAll(config.f
 
 game.flipCardsBack = function (cardsArray) {
     for (let i = 0; i < cardsArray.length; i++) {
+
         for (let j = 0; j < cardsArray[i].childNodes.length; j++) {
+
             if (cardsArray[i].childNodes[j].className === config.backOfCard) {
                 cardsArray[i].childNodes[j].style.transform = config.flipBackOfCardBack;
+
             } else if (cardsArray[i].childNodes[j].className === config.frontOfCard) {
                 cardsArray[i].childNodes[j].style.transform = config.flipFrontOfCardBack;
             }
@@ -92,7 +107,6 @@ game.flipCardsBack = function (cardsArray) {
 };
 
 game.isCardMatch = function() { return game.firstCardColor === game.secondCardColor; };
-
 game.isGameOver = function() { return game.getTotalCardsNumber() === game.matchedCards; };
 
 game.addEventListenerToArray = function(array) {
@@ -192,14 +206,14 @@ game.createCard = function(color) {
 
 game.createBoardDiv = function() {
     let boardDiv = document.createElement(config.htmlTag);
-    boardDiv.setAttribute(config.attributeToSet, 'container');
+    boardDiv.setAttribute(config.attributeToSet, config.boardAttribute);
 
     return boardDiv;
 };
 
 game.createRowDiv = function() {
     var rowDiv = document.createElement(config.htmlTag);
-    rowDiv.setAttribute(config.attributeToSet, 'row');
+    rowDiv.setAttribute(config.attributeToSet, config.rowAttribute);
 
     return rowDiv;
 };
@@ -235,7 +249,7 @@ game.createBoard = function() {
 game.initializeGame = function() {
     const board = game.createBoard();
     let gameDiv = document.createElement(config.htmlTag);
-    gameDiv.setAttribute('id', 'gameDiv');
+    gameDiv.setAttribute(config.gameDivAttributeToSet, config.gameDivAttribute);
     gameDiv.appendChild(board);
     document.body.appendChild(gameDiv);
 };
@@ -252,14 +266,15 @@ game.resetData = function() {
 game.fadeOffBoard = function() {
     const cards = document.getElementsByClassName(config.removed);
     for (let i = 0; i < cards.length; i++) {
+        
         for (let j = 0; j < cards[i].childNodes.length; j++) {
-            cards[i].childNodes[j].style.opacity = "0";
+            cards[i].childNodes[j].style.opacity = config.transparent;
         }
     }
 };
 
 game.clearBoard = function() {
-    const board = document.getElementById("gameDiv");
+    const board = document.getElementById(config.gameDivAttribute);
     if (board !== null) {
         if (game.isGameOver()) {
             game.fadeOffBoard();
@@ -273,9 +288,9 @@ game.clearBoard = function() {
 game.processForm = function() {
     game.clearBoard();
     game.resetData();
-    const columnNumber = document.getElementById("columnNumber");
+    const columnNumber = document.getElementById(config.columnNumberId);
     game.columnNumber = parseInt(columnNumber.options[columnNumber.selectedIndex].value);
-    const rowNumber = document.getElementById("rowNumber");
+    const rowNumber = document.getElementById(config.rowNumberId);
     game.rowNumber = parseInt(rowNumber.options[rowNumber.selectedIndex].value);
     if (isNaN(game.rowNumber) || isNaN(game.columnNumber)) {
         alert(config.alertString);
@@ -285,7 +300,7 @@ game.processForm = function() {
 };
 
 game.play = function() {
-    const playButton = document.getElementById("play");
+    const playButton = document.getElementById(config.playButtonId);
     playButton.addEventListener(config.eventToListen, function(event) {
         event.preventDefault();
         game.processForm();

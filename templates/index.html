@@ -8,16 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/game.css') }}">
     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" defer></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js" defer></script>
     <script src="{{ url_for('static', filename='scripts/game.js') }}" defer></script>
     <title>Memory Game</title>
 </head>
 <body>
     <div class="container">
         <form id="gameForm" class="form-inline text-center" role="form">
-
+            
+            <h3>TEST YOUR MEMORY</h3>
             <label for="columnNumber"><span class="glyphicon glyphicon-resize-horizontal"></span></label>
             <select name="columnNumber" id="columnNumber" class="selectpicker show-tick show-menu-arrow" data-width="auto" required>
                 <option value="" selected disabled>Please select the number or columns</option>

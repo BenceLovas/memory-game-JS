@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Passion+One');
-@import url('https://fonts.googleapis.com/css?family=Abril+Fatface');
-@import url('https://fonts.googleapis.com/css?family=Unica+One');
 @import url('https://fonts.googleapis.com/css?family=Prosto+One');
 * {
     margin: 0;
@@ -18,6 +15,14 @@ body * {
     margin-top: 20px;
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 120px;
+}
+
+
 .row > div {
     display: inline-block;
     border: 0;
@@ -30,15 +35,13 @@ body * {
 
 .card,
 .removed {
-    /* background-color: black; */
-    /* transform: perspective(600px) rotateY(0deg); */
     backface-visibility: hidden;
-    /* transition: transform .3s linear 0s; */
-    margin: 10px;
-    height: 100px;
-    width: 100px;
+    margin: 5px;
+    height: 110px;
+    width: 110px;
     border-radius: 5px;
 }
+
 .removed > .front,
 .card > .front {
     opacity: 1;
@@ -46,8 +49,8 @@ body * {
     transform: perspective(600px) rotateY(180deg);
     backface-visibility: hidden;
     transition: opacity 1s linear 0s, transform .5s linear 0s;
-    height: 100px;
-    width: 100px;
+    height: 110px;
+    width: 110px;
     border-radius: 5px;
 }
 .removed > .back,
@@ -57,16 +60,7 @@ body * {
     transform: perspective(600px) rotateY(0deg);
     backface-visibility: hidden;
     transition: opacity 1s linear 0s, transform .5s linear 0s;
-    height: 100px;
-    width: 100px;
+    height: 110px;
+    width: 110px;
     border-radius: 5px;
-}
-
-.hidden {
-    backface-visibility: hidden;
-    visibility: hidden;
-    display: inline-block;
-    width: 100px;
-    height: 100px;
-    margin: 5px;
 }
