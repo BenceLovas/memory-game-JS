@@ -99,3 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+static/scripts/game2.js
+static/scripts/game2b.js

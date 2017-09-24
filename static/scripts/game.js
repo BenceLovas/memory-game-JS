@@ -115,8 +115,31 @@ game.removeCards = function(array) {
 
 game.processMatch = function() {
     game.removeCards(game.selectFlippedCards());
-    game.addEventListenerToArray(game.getCards(), game.turnProcess);
-}
+    game.addEventListenerToArray(game.getCards());
+};
+
+game.afterGame = function () {
+    alert(config.victoryString);
+    game.flipCardsBack(document.getElementsByClassName(config.removed));
+};
+
+game.resetUnmatchedCards = function() {
+    game.flipCardsBack(game.selectFlippedCards());
+    game.addEventListenerToArray(game.getCards());
+};
+
+game.afterSecondFlip = function() {
+    if (game.isCardMatch()) {
+        game.matchedCards += 2;
+        setTimeout(function() { game.processMatch(); }, 500);
+        if (game.isGameOver()) {
+            setTimeout(function() { game.afterGame(); }, 500);
+            setTimeout(function() { game.clearBoard(); }, 1000);
+        }
+    } else {
+        setTimeout(function() { game.resetUnmatchedCards(); }, 1000);
+    }
+};
 
 game.turnProcess = function() {
     if (game.firstClick) {
@@ -125,65 +148,85 @@ game.turnProcess = function() {
     } else {
         game.clickProcess(this);
         game.removeEventListenerFromArray(game.getCards());
-        if (game.isCardMatch()) {
-            game.matchedCards += 2;
-            setTimeout(function() {
-                game.processMatch();
-            }, 500);
-            if (game.isGameOver()) {
-                setTimeout(function() {
-                    alert(config.victoryString);
-                    game.flipCardsBack(document.getElementsByClassName(config.removed));
-                }, 500);
-                setTimeout(function() {
-                    game.clearBoard();
-                }, 1000);
-            }
-        } else {
-            setTimeout(function() {
-                game.flipCardsBack(game.selectFlippedCards());
-                game.addEventListenerToArray(game.getCards());
-            }, 1000);
-        }
+        game.afterSecondFlip();
     }
 };
 
-game.createCard = function(color) {
-    let card = document.createElement(config.htmlTag);
+game.createCardBack = function() {
     let cardBack = document.createElement(config.htmlTag);
-    let cardFront = document.createElement(config.htmlTag);
     cardBack.classList.add(config.backOfCard);
-    cardFront.classList.add(config.frontOfCard);
     cardBack.style.backgroundColor = config.coverColor;
+    
+    return cardBack;
+}
+
+game.createCardFront = function(color) {
+    var cardFront = document.createElement(config.htmlTag);
+    cardFront.classList.add(config.frontOfCard);
     cardFront.style.backgroundColor = color;
-    card.dataset.color = color;
-    card.dataset.flipped = false;
-    card.classList.add(config.commonClass);
+    
+    return cardFront;
+}
+
+game.createCardWrapper = function(color) {
+    var cardWrapper = document.createElement(config.htmlTag);
+    cardWrapper.dataset.color = color;
+    cardWrapper.dataset.flipped = false;
+    cardWrapper.classList.add(config.commonClass);
+    cardWrapper.addEventListener(config.eventToListen, game.turnProcess);
+    
+    return cardWrapper;
+}
+
+game.createCard = function(color) {
+    var cardBack = game.createCardBack();
+    var cardFront = game.createCardFront(color);
+    var card = game.createCardWrapper(color);
     card.appendChild(cardFront);
     card.appendChild(cardBack);
-    card.addEventListener(config.eventToListen, game.turnProcess);
 
     return card;
 };
 
-game.createBoard = function() {
+game.createBoardDiv = function() {
     let boardDiv = document.createElement(config.htmlTag);
     boardDiv.setAttribute(config.attributeToSet, 'container');
-    let rowDiv = document.createElement(config.htmlTag);
+
+    return boardDiv;
+}
+
+game.createRowDiv = function() {
+    var rowDiv = document.createElement(config.htmlTag);
     rowDiv.setAttribute(config.attributeToSet, 'row');
 
-    const colorsArray = game.getRandomizedArray();
+    return rowDiv;
+}
+
+game.applyColorsToCards = function(colorsArray) {
+    var cardsArray = [];
     for (let i = 0; i < colorsArray.length; i++) {
-
-        const card = game.createCard(colorsArray[i]);
-        rowDiv.appendChild(card);
-
-        if (rowDiv.childElementCount === game.columnNumber) {
-            boardDiv.appendChild(rowDiv);
-            rowDiv = document.createElement(config.htmlTag);
-            rowDiv.setAttribute(config.attributeToSet, 'row');
-        }    
+        var card = game.createCard(colorsArray[i]);
+        cardsArray.push(card);
     }
+    
+    return cardsArray;
+}
+
+game.isRowFull = function(rowDiv) { return rowDiv.childElementCount === game.columnNumber; };
+
+game.createBoard = function() {
+    var boardDiv = game.createBoardDiv();
+    var rowDiv = game.createRowDiv();
+    var cardsArray = game.applyColorsToCards(game.getRandomizedArray());
+
+    for (let i = 0; i < cardsArray.length; i++) {
+        rowDiv.appendChild(cardsArray[i]);
+        if (game.isRowFull(rowDiv)) {
+            boardDiv.appendChild(rowDiv);
+            rowDiv = game.createRowDiv();
+        }
+    }
+
     return boardDiv;
 };
 
@@ -208,16 +251,13 @@ game.clearBoard = function() {
     const board = document.getElementById("gameDiv");
     if (board !== null) {
         if (game.isGameOver()) {
-            console.log("im here");
             const cards = document.getElementsByClassName(config.removed);
             for (let i = 0; i < cards.length; i++) {
                 for (let j = 0; j < cards[i].childNodes.length; j++) {
                     cards[i].childNodes[j].style.opacity = "0";
                 }
             }
-            setTimeout(function() {
-                board.parentNode.removeChild(board);
-            }, 500);
+            setTimeout(function() { board.parentNode.removeChild(board); }, 500);
         } else {
             board.parentNode.removeChild(board);
         }
