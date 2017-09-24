@@ -37,6 +37,7 @@ body * {
     margin: 10px;
     height: 100px;
     width: 100px;
+    border-radius: 5px;
 }
 .removed > .front,
 .card > .front {
@@ -47,6 +48,7 @@ body * {
     transition: opacity 1s linear 0s, transform .5s linear 0s;
     height: 100px;
     width: 100px;
+    border-radius: 5px;
 }
 .removed > .back,
 .card > .back {
@@ -57,7 +59,7 @@ body * {
     transition: opacity 1s linear 0s, transform .5s linear 0s;
     height: 100px;
     width: 100px;
-
+    border-radius: 5px;
 }
 
 .hidden {
@@ -66,5 +68,5 @@ body * {
     display: inline-block;
     width: 100px;
     height: 100px;
-    margin: 10px;
+    margin: 5px;
 }
