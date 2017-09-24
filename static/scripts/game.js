@@ -6,7 +6,7 @@ Array.prototype.shuffle = function() {
 }
 
 Array.prototype.double = function() {
-    var length = this.length;
+    const length = this.length;
     for (let i = 0; i < length; i++) {
         this.push(this[i]);
     }
@@ -24,7 +24,7 @@ const config = {
     colorsArray: ["#679327","#3A1B0F","#A4DA65","#5A3810","#990515","#250D3B","#E0082D","#50105A"],
 };
 
-const game = {
+var game = {
     flippedCards: 0,
     firstClick: true,
     cards: document.getElementsByClassName(config.commonClass),
@@ -34,16 +34,12 @@ const game = {
     rowNumber: null,
 };
 
-// game.gameDiv = document.getElementById("wrapper");
-
-// game.columnNumber = parseInt(game.gameDiv.dataset.columnNumber);
-// game.rowNumber = parseInt(game.gameDiv.dataset.rowNumber);
 game.getTotalCardsNumber = function() { return game.columnNumber * game.rowNumber; };
 game.getColorsNeeded = function() { return game.getTotalCardsNumber() / 2; };
 
 game.getArraySlice = function() { return config.colorsArray.slice(0, game.getColorsNeeded()); };
 game.getRandomizedArray = function() {
-    const array = game.getArraySlice();
+    let array = game.getArraySlice();
     array.double();
     array.shuffle();
     
@@ -51,11 +47,13 @@ game.getRandomizedArray = function() {
 };
 
 game.flipCard = function(clickedCard) {
-    clickedCard.style.transform = "perspective(200px) rotateY(-180deg)";
-    setTimeout(function() {
-        clickedCard.style.transform = "perspective(200px) rotateY(0deg)";
-        clickedCard.style.backgroundColor = clickedCard.dataset.color;
-    }, 200);
+    for (let i = 0; i < clickedCard.childNodes.length; i++) {
+        if (clickedCard.childNodes[i].className === "back") {
+            clickedCard.childNodes[i].style.transform = "perspective(600px) rotateY(-180deg)";
+        } else if (clickedCard.childNodes[i].className === "front") {
+            clickedCard.childNodes[i].style.transform = "perspective(600px) rotateY(0deg)";
+        }
+    }
     clickedCard.dataset.flipped = true;
 };
 
@@ -75,7 +73,13 @@ game.selectFlippedCards = function() { return document.querySelectorAll(config.f
 game.flipCardsBack = function () {
     const cards = game.selectFlippedCards();
     for (let i = 0; i < cards.length; i++) {
-        cards[i].style.backgroundColor = config.coverColor;
+        for (let j = 0; j < cards[i].childNodes.length; j++) {
+            if (cards[i].childNodes[j].className === "back") {
+                cards[i].childNodes[j].style.transform = "perspective(600px) rotateY(0deg)";
+            } else if (cards[i].childNodes[j].className === "front") {
+                cards[i].childNodes[j].style.transform = "perspective(600px) rotateY(180deg)";
+            }
+        }
         cards[i].dataset.flipped = false;
     }
 };
@@ -97,13 +101,13 @@ game.removeEventListenerFromArray = function(array, callbackFunction) {
 
 game.removeCards = function(array) {
     for (let i = 0; i < array.length; i++) {
+        array[i].classList.add(config.removed);
         array[i].classList.remove(config.commonClass);
         array[i].dataset.flipped = config.removed;
     }
 };
 
 game.processMatch = function(callbackFunction) {
-    game.flippedCards += 2;
     const cards = game.selectFlippedCards();
     game.removeCards(cards);
     game.addEventListenerToArray(game.cards, callbackFunction);
@@ -117,9 +121,18 @@ game.turnProcess = function() {
         game.clickProcess(this);
         game.removeEventListenerFromArray(game.cards, game.turnProcess);
         if (game.isCardMatch()) {
-            game.processMatch(game.turnProcess);
+            game.flippedCards += 2;
+            setTimeout(function() {
+                game.processMatch(game.turnProcess);
+            }, 500);
             if (game.isGameOver()) {
-                alert(config.victoryString);
+                setTimeout(function() {
+                    alert(config.victoryString);
+                    game.flipCardsBackAfterWin();
+                }, 500);
+                setTimeout(function() {
+                    game.clearBoardAfterWin();
+                }, 1000);
             }
         } else {
             setTimeout(function() {
@@ -131,20 +144,29 @@ game.turnProcess = function() {
 };
 
 game.createCard = function(color) {
-    const card = document.createElement(config.htmlTag);
+    let card = document.createElement(config.htmlTag);
+    let cardBack = document.createElement(config.htmlTag);
+    let cardFront = document.createElement(config.htmlTag);
+    cardBack.classList.add("back");
+    cardFront.classList.add("front");
+    cardBack.style.backgroundColor = config.coverColor;
+    cardFront.style.backgroundColor = color;
     card.dataset.color = color;
     card.dataset.flipped = false;
-    card.classList.add(config.commonClass, "col", "col-xs-4", "col-sm-2", "col-md-2", "mr-auto");
+    // card.classList.add(config.commonClass, "col", "col-xs-4", "col-sm-2", "col-md-2", "mr-auto");
+    card.classList.add(config.commonClass);
+    card.appendChild(cardFront);
+    card.appendChild(cardBack);
     card.addEventListener(config.eventToListen, game.turnProcess);
 
     return card;
 };
 
 game.createBoard = function() {
-    const boardDiv = document.createElement(config.htmlTag);
-    boardDiv.setAttribute(config.attributeToSet, 'container-fluid');
+    let boardDiv = document.createElement(config.htmlTag);
+    boardDiv.setAttribute(config.attributeToSet, 'container');
     let rowDiv = document.createElement(config.htmlTag);
-    rowDiv.setAttribute(config.attributeToSet, 'row justify-content-between');
+    rowDiv.setAttribute(config.attributeToSet, 'row');
 
     const colorsArray = game.getRandomizedArray();
     for (let i = 0; i < colorsArray.length; i++) {
@@ -155,7 +177,7 @@ game.createBoard = function() {
         if (rowDiv.childElementCount === game.columnNumber) {
             boardDiv.appendChild(rowDiv);
             rowDiv = document.createElement(config.htmlTag);
-            rowDiv.setAttribute(config.attributeToSet, 'row justify-content-between');
+            rowDiv.setAttribute(config.attributeToSet, 'row');
         }    
     }
     return boardDiv;
@@ -163,7 +185,7 @@ game.createBoard = function() {
 
 game.initializeGame = function() {
     const board = game.createBoard();
-    const gameDiv = document.createElement(config.htmlTag);
+    let gameDiv = document.createElement(config.htmlTag);
     gameDiv.setAttribute('id', 'gameDiv');
     gameDiv.appendChild(board);
     document.body.appendChild(gameDiv);
@@ -178,6 +200,35 @@ game.resetData = function() {
     game.columnNumber = null;
     game.rowNumber = null;
 }
+
+game.flipCardsBackAfterWin = function() {
+    const cards = document.getElementsByClassName(config.removed);
+    for (let i = 0; i < cards.length; i++) {
+        for (let j = 0; j < cards[i].childNodes.length; j++) {
+            if (cards[i].childNodes[j].className === "back") {
+                cards[i].childNodes[j].style.transform = "perspective(600px) rotateY(0deg)";
+            } else if (cards[i].childNodes[j].className === "front") {
+                cards[i].childNodes[j].style.transform = "perspective(600px) rotateY(180deg)";
+            }
+        }
+    }
+}
+
+game.clearBoardAfterWin = function() {
+    const board = document.getElementById("gameDiv");
+    if (board !== null) {
+        const cards = document.getElementsByClassName(config.removed);
+        for (let i = 0; i < cards.length; i++) {
+            for (let j = 0; j < cards[i].childNodes.length; j++) {
+                cards[i].childNodes[j].style.opacity = "0";
+            }
+        }
+        setTimeout(function() {
+            board.parentNode.removeChild(board);
+        }, 500);
+    }
+}
+
 
 game.clearBoard = function() {
     const board = document.getElementById("gameDiv");
@@ -202,7 +253,10 @@ game.processForm = function() {
 
 game.play = function() {
     const playButton = document.getElementById("play");
-    playButton.addEventListener("click", game.processForm);
+    playButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        game.processForm();
+    });
 }
 
 game.play();

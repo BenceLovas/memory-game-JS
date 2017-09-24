@@ -1,27 +1,70 @@
+@import url('https://fonts.googleapis.com/css?family=Passion+One');
+@import url('https://fonts.googleapis.com/css?family=Abril+Fatface');
+@import url('https://fonts.googleapis.com/css?family=Unica+One');
+@import url('https://fonts.googleapis.com/css?family=Prosto+One');
 * {
     margin: 0;
     padding: 0;
 }
+body {
+    background-color: #83E4D5;
+}
 
-.row {
-    margin: 15px 5px;
+body * {
+    font-family: "Prosto One";
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.row > div {
+    display: inline-block;
+    border: 0;
+}
+
+#gameDiv {
+    opacity: 1;
+    transition: opatcity .5s linear 0s;
 }
 
 .card,
-.col,
 .removed {
-    background-color: black;
-    transform: perspective(600px) rotateY(0deg);
+    /* background-color: black; */
+    /* transform: perspective(600px) rotateY(0deg); */
     backface-visibility: hidden;
-    transition: transform .3s linear 0s;
+    /* transition: transform .3s linear 0s; */
+    margin: 10px;
     height: 100px;
     width: 100px;
 }
+.removed > .front,
+.card > .front {
+    opacity: 1;
+    position: absolute;
+    transform: perspective(600px) rotateY(180deg);
+    backface-visibility: hidden;
+    transition: opacity 1s linear 0s, transform .5s linear 0s;
+    height: 100px;
+    width: 100px;
+}
+.removed > .back,
+.card > .back {
+    opacity: 1;
+    position: absolute;
+    transform: perspective(600px) rotateY(0deg);
+    backface-visibility: hidden;
+    transition: opacity 1s linear 0s, transform .5s linear 0s;
+    height: 100px;
+    width: 100px;
+
+}
 
 .hidden {
+    backface-visibility: hidden;
     visibility: hidden;
     display: inline-block;
     width: 100px;
     height: 100px;
-    margin: 0px 3px;
+    margin: 10px;
 }
