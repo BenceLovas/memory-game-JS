@@ -3,14 +3,14 @@ Array.prototype.shuffle = function() {
         let j = Math.floor(Math.random() * i);
         [this[i - 1], this[j]] = [this[j], this[i - 1]];
     }
-}
+};
 
 Array.prototype.double = function() {
     const length = this.length;
     for (let i = 0; i < length; i++) {
         this.push(this[i]);
     }
-}
+};
 
 const config = {
     flipBackOfCard: "perspective(600px) rotateY(-180deg)",
@@ -77,6 +77,7 @@ game.clickProcess = function(clickedCard) {
 };
 
 game.selectFlippedCards = function() { return document.querySelectorAll(config.flippedCardSelector); };
+
 game.flipCardsBack = function (cardsArray) {
     for (let i = 0; i < cardsArray.length; i++) {
         for (let j = 0; j < cardsArray[i].childNodes.length; j++) {
@@ -91,6 +92,7 @@ game.flipCardsBack = function (cardsArray) {
 };
 
 game.isCardMatch = function() { return game.firstCardColor === game.secondCardColor; };
+
 game.isGameOver = function() { return game.getTotalCardsNumber() === game.matchedCards; };
 
 game.addEventListenerToArray = function(array) {
@@ -158,7 +160,7 @@ game.createCardBack = function() {
     cardBack.style.backgroundColor = config.coverColor;
     
     return cardBack;
-}
+};
 
 game.createCardFront = function(color) {
     var cardFront = document.createElement(config.htmlTag);
@@ -166,7 +168,7 @@ game.createCardFront = function(color) {
     cardFront.style.backgroundColor = color;
     
     return cardFront;
-}
+};
 
 game.createCardWrapper = function(color) {
     var cardWrapper = document.createElement(config.htmlTag);
@@ -176,7 +178,7 @@ game.createCardWrapper = function(color) {
     cardWrapper.addEventListener(config.eventToListen, game.turnProcess);
     
     return cardWrapper;
-}
+};
 
 game.createCard = function(color) {
     var cardBack = game.createCardBack();
@@ -193,14 +195,14 @@ game.createBoardDiv = function() {
     boardDiv.setAttribute(config.attributeToSet, 'container');
 
     return boardDiv;
-}
+};
 
 game.createRowDiv = function() {
     var rowDiv = document.createElement(config.htmlTag);
     rowDiv.setAttribute(config.attributeToSet, 'row');
 
     return rowDiv;
-}
+};
 
 game.applyColorsToCards = function(colorsArray) {
     var cardsArray = [];
@@ -210,7 +212,7 @@ game.applyColorsToCards = function(colorsArray) {
     }
     
     return cardsArray;
-}
+};
 
 game.isRowFull = function(rowDiv) { return rowDiv.childElementCount === game.columnNumber; };
 
@@ -236,7 +238,7 @@ game.initializeGame = function() {
     gameDiv.setAttribute('id', 'gameDiv');
     gameDiv.appendChild(board);
     document.body.appendChild(gameDiv);
-}
+};
 
 game.resetData = function() {
     game.matchedCards = 0;
@@ -245,24 +247,28 @@ game.resetData = function() {
     game.secondCardColor = null;
     game.columnNumber = null;
     game.rowNumber = null;
-}
+};
+
+game.fadeOffBoard = function() {
+    const cards = document.getElementsByClassName(config.removed);
+    for (let i = 0; i < cards.length; i++) {
+        for (let j = 0; j < cards[i].childNodes.length; j++) {
+            cards[i].childNodes[j].style.opacity = "0";
+        }
+    }
+};
 
 game.clearBoard = function() {
     const board = document.getElementById("gameDiv");
     if (board !== null) {
         if (game.isGameOver()) {
-            const cards = document.getElementsByClassName(config.removed);
-            for (let i = 0; i < cards.length; i++) {
-                for (let j = 0; j < cards[i].childNodes.length; j++) {
-                    cards[i].childNodes[j].style.opacity = "0";
-                }
-            }
+            game.fadeOffBoard();
             setTimeout(function() { board.parentNode.removeChild(board); }, 500);
         } else {
             board.parentNode.removeChild(board);
         }
     }
-}
+};
 
 game.processForm = function() {
     game.clearBoard();
@@ -276,7 +282,7 @@ game.processForm = function() {
     } else {
         game.initializeGame();
     }
-}
+};
 
 game.play = function() {
     const playButton = document.getElementById("play");
@@ -284,6 +290,6 @@ game.play = function() {
         event.preventDefault();
         game.processForm();
     });
-}
+};
 
 game.play();
